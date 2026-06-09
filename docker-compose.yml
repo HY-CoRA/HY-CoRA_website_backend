@@ -24,6 +24,7 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hycora
       SPRING_DATASOURCE_USERNAME: hycora
       SPRING_DATASOURCE_PASSWORD: hycora1234
