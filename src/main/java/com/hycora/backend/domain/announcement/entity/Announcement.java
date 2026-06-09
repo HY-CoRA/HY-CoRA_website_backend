@@ -8,7 +8,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "announcements")
+@Table(
+    name = "announcements",
+    indexes = {
+        @Index(name = "idx_announcements_category", columnList = "category"),
+        @Index(name = "idx_announcements_published", columnList = "published")
+    }
+)
 @Getter
 @NoArgsConstructor
 public class Announcement {

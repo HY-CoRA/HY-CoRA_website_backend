@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "site_config")
+@Table(
+    name = "site_config",
+    uniqueConstraints = @UniqueConstraint(name = "uk_site_config_key", columnNames = {"`key`"})
+)
 @Getter
 @NoArgsConstructor
 public class SiteConfig {
@@ -23,6 +26,9 @@ public class SiteConfig {
     @Column(columnDefinition = "TEXT")
     private String value;
 
+    @Column(name = "created_at")
+    private LocalDate createdAt;
+
     @Column(name = "updated_at")
     private LocalDate updatedAt;
 
@@ -31,6 +37,11 @@ public class SiteConfig {
     private Admin admin;
 
     @PrePersist
+    private void prePersist() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+    }
+
     @PreUpdate
     private void preUpdate() {
         this.updatedAt = LocalDate.now();

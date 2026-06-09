@@ -26,8 +26,17 @@ public class Admin {
     @Column(name = "created_at")
     private LocalDate createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDate updatedAt;
+
     @PrePersist
     private void prePersist() {
         this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        this.updatedAt = LocalDate.now();
     }
 }
