@@ -11,7 +11,8 @@ import java.time.LocalDate;
 @Table(
     name = "activities",
     indexes = {
-        @Index(name = "idx_activities_status", columnList = "status")
+        @Index(name = "idx_activities_status", columnList = "status"),
+        @Index(name = "idx_activities_recruit_end", columnList = "recruit_end")
     }
 )
 @Getter

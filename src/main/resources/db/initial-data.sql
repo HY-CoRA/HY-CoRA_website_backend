@@ -2,11 +2,11 @@
 -- 실행 방법: docker exec -i hycora-mysql mysql -u hycora -phycora1234 hycora < src/main/resources/db/initial-data.sql
 
 -- 관리자 계정 초기 데이터
-INSERT INTO admin (email, role, created_at, updated_at)
-VALUES ('admin@hycora.co.kr', 'OWNER', CURDATE(), CURDATE())
+INSERT INTO admin (email, created_at, updated_at)
+VALUES ('admin@hycora.co.kr', CURDATE(), CURDATE())
 ON DUPLICATE KEY UPDATE updated_at = CURDATE();
 
--- 사이트 설정 초기 데이터 (관리자 계정 생성 후 실행)
+-- 사이트 설정 초기 데이터
 SET @admin_id = (SELECT admin_id FROM admin WHERE email = 'admin@hycora.co.kr');
 
 INSERT INTO site_config (`key`, value, created_at, updated_at, admin_id)

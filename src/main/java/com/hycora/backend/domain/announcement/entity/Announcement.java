@@ -12,7 +12,8 @@ import java.time.LocalDate;
     name = "announcements",
     indexes = {
         @Index(name = "idx_announcements_category", columnList = "category"),
-        @Index(name = "idx_announcements_published", columnList = "published")
+        @Index(name = "idx_announcements_published", columnList = "published"),
+        @Index(name = "idx_announcements_created_at", columnList = "created_at")
     }
 )
 @Getter
