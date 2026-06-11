@@ -30,6 +30,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: hycora1234
       CORS_ORIGIN: ${CORS_ORIGIN:-https://hycora.co.kr}
       JWT_SECRET: ${JWT_SECRET:-changeme}
+      ADMIN_INITIAL_EMAIL: ${ADMIN_INITIAL_EMAIL:-}
     ports:
       - "8080:8080"
 
