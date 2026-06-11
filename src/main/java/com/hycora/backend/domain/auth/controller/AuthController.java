@@ -1,6 +1,8 @@
 package com.hycora.backend.domain.auth.controller;
 
-import com.hycora.backend.domain.auth.dto.*;
+import com.hycora.backend.domain.auth.dto.AuthResponseDto;
+import com.hycora.backend.domain.auth.dto.MagicLinkRequestDto;
+import com.hycora.backend.domain.auth.dto.MagicLinkVerifyDto;
 import com.hycora.backend.domain.auth.service.AuthService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-        // Stateless JWT → 클라이언트에서 토큰 삭제
         return ResponseEntity.ok(Map.of("success", true));
     }
 
@@ -53,55 +54,6 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    // ── WebAuthn Login ────────────────────────────────────────────
-
-    @PostMapping("/webauthn/login/options")
-    public ResponseEntity<?> loginOptions(@RequestBody WebAuthnLoginOptionsDto dto) {
-        try {
-            return ResponseEntity.ok(authService.getLoginOptions(dto.getEmail()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @PostMapping("/webauthn/login/verify")
-    public ResponseEntity<?> loginVerify(@RequestBody WebAuthnCredentialDto dto) {
-        try {
-            AuthResponseDto response = authService.verifyLogin(
-                    dto.getEmail(),
-                    dto.getCredential().getId()
-            );
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    // ── WebAuthn Register ─────────────────────────────────────────
-
-    @PostMapping("/webauthn/register/options")
-    public ResponseEntity<?> registerOptions(@RequestBody WebAuthnRegisterOptionsDto dto) {
-        try {
-            return ResponseEntity.ok(authService.getRegisterOptions(dto.getEmail(), dto.getDisplayName()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @PostMapping("/webauthn/register/verify")
-    public ResponseEntity<?> registerVerify(@RequestBody WebAuthnCredentialDto dto) {
-        try {
-            authService.registerCredential(
-                    dto.getEmail(),
-                    dto.getCredential().getId(),
-                    dto.getCredential().getResponse().getAttestationObject()
-            );
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         }
     }
 }

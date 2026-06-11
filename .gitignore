@@ -1,5 +1,6 @@
 .env
 .claude/
+CLAUDE.md
 
 # Gradle
 .gradle/

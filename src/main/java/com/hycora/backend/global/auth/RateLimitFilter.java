@@ -37,8 +37,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String uri = request.getRequestURI();
-        boolean isAuthEndpoint = uri.startsWith("/api/auth/magic-link") ||
-                uri.startsWith("/api/auth/webauthn/login");
+        boolean isAuthEndpoint = uri.startsWith("/api/auth/magic-link");
 
         if (isAuthEndpoint) {
             String ip = getClientIp(request);
