@@ -34,18 +34,16 @@ public class AuthService {
 
     @Transactional
     public void requestMagicLink(String email) {
-        Admin admin = adminRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Admin not found"));
-
-        String token = UUID.randomUUID().toString();
-        MagicLinkToken magicLink = MagicLinkToken.builder()
-                .token(token)
-                .admin(admin)
-                .expiresAt(LocalDateTime.now().plusMinutes(15))
-                .build();
-        magicLinkTokenRepository.save(magicLink);
-
-        sendMagicLinkEmail(email, token);
+        adminRepository.findByEmail(email).ifPresent(admin -> {
+            String token = UUID.randomUUID().toString();
+            MagicLinkToken magicLink = MagicLinkToken.builder()
+                    .token(token)
+                    .admin(admin)
+                    .expiresAt(LocalDateTime.now().plusMinutes(15))
+                    .build();
+            magicLinkTokenRepository.save(magicLink);
+            sendMagicLinkEmail(email, token);
+        });
     }
 
     private void sendMagicLinkEmail(String to, String token) {
@@ -58,7 +56,8 @@ public class AuthService {
                     "본인이 요청하지 않았다면 무시하세요.");
             mailSender.send(message);
         } catch (Exception e) {
-            log.warn("Magic link 이메일 발송 실패: {}", e.getMessage());
+            log.error("Magic link 이메일 발송 실패: {}", e.getMessage());
+            throw new RuntimeException("이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.");
         }
     }
 

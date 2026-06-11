@@ -42,8 +42,8 @@ public class AuthController {
         try {
             authService.requestMagicLink(dto.getEmail());
             return ResponseEntity.ok(Map.of("success", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 
