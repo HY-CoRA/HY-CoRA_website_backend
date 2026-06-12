@@ -11,19 +11,17 @@ public class PastEventDto {
     @Getter
     @Builder
     public static class Response {
-        private String id;
+        private Long id;
         private String imageUrl;
         private String title;
         private String description;
-        private Integer order;
 
         public static Response from(PastEvent e) {
             return Response.builder()
-                    .id(String.valueOf(e.getId()))
+                    .id(e.getId())
                     .imageUrl(e.getImageUrl())
                     .title(e.getTitle())
                     .description(e.getDescription())
-                    .order(e.getOrder())
                     .build();
         }
     }
