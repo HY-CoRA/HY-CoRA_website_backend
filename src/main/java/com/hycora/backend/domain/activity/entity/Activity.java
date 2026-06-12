@@ -1,9 +1,7 @@
 package com.hycora.backend.domain.activity.entity;
 
-import com.hycora.backend.domain.admin.entity.Admin;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -17,6 +15,8 @@ import java.time.LocalDate;
 )
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Activity {
 
     @Id
@@ -47,9 +47,6 @@ public class Activity {
     @Column(length = 100)
     private String role;
 
-    @Column(length = 50)
-    private String phone;
-
     @Column(length = 255)
     private String participants;
 
@@ -63,6 +60,9 @@ public class Activity {
     private String periodText;
 
     @Column(columnDefinition = "TEXT")
+    private String schedule;
+
+    @Column(columnDefinition = "TEXT")
     private String images;
 
     @Column(name = "created_at")
@@ -70,10 +70,6 @@ public class Activity {
 
     @Column(name = "updated_at")
     private LocalDate updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
 
     @PrePersist
     private void prePersist() {
@@ -84,5 +80,25 @@ public class Activity {
     @PreUpdate
     private void preUpdate() {
         this.updatedAt = LocalDate.now();
+    }
+
+    public void update(String status, String title, String desc, String intro,
+                       String mentor, String role, String place, String participants,
+                       LocalDate recruitStart, LocalDate recruitEnd, String periodText,
+                       String schedule, String images) {
+        this.status = status;
+        this.statusLabel = StatusLabel.from(status);
+        this.title = title;
+        this.desc = desc;
+        this.intro = intro;
+        this.mentor = mentor;
+        this.role = role;
+        this.place = place;
+        this.participants = participants;
+        this.recruitStart = recruitStart;
+        this.recruitEnd = recruitEnd;
+        this.periodText = periodText;
+        this.schedule = schedule;
+        this.images = images;
     }
 }
