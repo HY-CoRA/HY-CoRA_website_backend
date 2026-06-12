@@ -40,7 +40,6 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         // 인증 API
                         .requestMatchers("/api/auth/magic-link/**").permitAll()
-                        .requestMatchers("/api/auth/webauthn/**").permitAll()
                         // 나머지는 인증 필요
                         .anyRequest().authenticated()
                 )
