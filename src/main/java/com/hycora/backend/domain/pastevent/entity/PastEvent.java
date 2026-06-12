@@ -1,9 +1,7 @@
 package com.hycora.backend.domain.pastevent.entity;
 
-import com.hycora.backend.domain.admin.entity.Admin;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -11,6 +9,8 @@ import java.time.LocalDate;
 @Table(name = "past_events")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PastEvent {
 
     @Id
@@ -35,10 +35,6 @@ public class PastEvent {
     @Column(name = "updated_at")
     private LocalDate updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
-
     @PrePersist
     private void prePersist() {
         this.createdAt = LocalDate.now();
@@ -48,5 +44,16 @@ public class PastEvent {
     @PreUpdate
     private void preUpdate() {
         this.updatedAt = LocalDate.now();
+    }
+
+    public void update(String imageUrl, String title, String description, Integer order) {
+        this.imageUrl = imageUrl;
+        this.title = title;
+        this.description = description;
+        this.order = order;
+    }
+
+    public void updateOrder(Integer order) {
+        this.order = order;
     }
 }
