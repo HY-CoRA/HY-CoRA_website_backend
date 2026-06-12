@@ -16,7 +16,7 @@ public class ActivityDto {
     @Getter
     @Builder
     public static class Response {
-        private Long id;
+        private String id;
         private String status;
         private String statusLabel;
         private String title;
@@ -34,7 +34,7 @@ public class ActivityDto {
 
         public static Response from(Activity a) {
             return Response.builder()
-                    .id(a.getId())
+                    .id(String.valueOf(a.getId()))
                     .status(a.getStatus())
                     .statusLabel(a.getStatusLabel())
                     .title(a.getTitle())

@@ -32,7 +32,7 @@ public class ActivityController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody ActivityDto.Request req) {
         try {
-            return ResponseEntity.status(201).body(Map.of("id", activityService.create(req)));
+            return ResponseEntity.status(201).body(Map.of("id", String.valueOf(activityService.create(req))));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         }
@@ -41,7 +41,7 @@ public class ActivityController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ActivityDto.Request req) {
         try {
-            return ResponseEntity.ok(Map.of("id", activityService.update(id, req)));
+            return ResponseEntity.ok(Map.of("id", String.valueOf(activityService.update(id, req))));
         } catch (IllegalArgumentException e) {
             String msg = e.getMessage();
             int status = msg.contains("not found") ? 404 : 400;
