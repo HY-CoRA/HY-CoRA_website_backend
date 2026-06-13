@@ -33,7 +33,7 @@ public class SiteConfigService {
     public Map<String, Object> get(String key) {
         validateKey(key);
         return siteConfigRepository.findByKey(key)
-                .map(config -> parseValue(config.getValue()))
+                .map(config -> parseValue(key, config.getValue()))
                 .orElse(DEFAULTS.get(key));
     }
 
@@ -55,12 +55,13 @@ public class SiteConfigService {
         }
     }
 
-    private Map<String, Object> parseValue(String json) {
+    private Map<String, Object> parseValue(String key, String json) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            // 단순 URL 문자열인 경우 imageUrl로 감싸서 반환
-            return java.util.Map.of("imageUrl", json, "altText", "");
+            // 단순 URL 문자열인 경우 imageUrl에 넣고 altText는 기본값 사용
+            Map<String, Object> defaults = DEFAULTS.get(key);
+            return java.util.Map.of("imageUrl", json, "altText", defaults.getOrDefault("altText", ""));
         }
     }
 
