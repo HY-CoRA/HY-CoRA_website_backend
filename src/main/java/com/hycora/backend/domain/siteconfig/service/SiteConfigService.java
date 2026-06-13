@@ -59,7 +59,8 @@ public class SiteConfigService {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse config value");
+            // 단순 URL 문자열인 경우 imageUrl로 감싸서 반환
+            return java.util.Map.of("imageUrl", json, "altText", "");
         }
     }
 
