@@ -50,6 +50,9 @@ public class Activity {
     @Column(length = 255)
     private String participants;
 
+    @Column(length = 50)
+    private String phone;
+
     @Column(name = "recruit_start")
     private LocalDate recruitStart;
 
@@ -83,7 +86,7 @@ public class Activity {
     }
 
     public void update(String status, String title, String desc, String intro,
-                       String mentor, String role, String place, String participants,
+                       String mentor, String role, String place, String participants, String phone,
                        LocalDate recruitStart, LocalDate recruitEnd, String periodText,
                        String schedule, String images) {
         this.status = status;
@@ -95,6 +98,7 @@ public class Activity {
         this.role = role;
         this.place = place;
         this.participants = participants;
+        this.phone = phone;
         this.recruitStart = recruitStart;
         this.recruitEnd = recruitEnd;
         this.periodText = periodText;

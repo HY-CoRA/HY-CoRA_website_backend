@@ -36,9 +36,10 @@ public class ActivityService {
     @Transactional
     public Long create(ActivityDto.Request req) {
         validate(req);
+        String status = (req.getStatus() == null || req.getStatus().isBlank()) ? "scheduled" : req.getStatus();
         Activity activity = Activity.builder()
-                .status(req.getStatus())
-                .statusLabel(StatusLabel.from(req.getStatus()))
+                .status(status)
+                .statusLabel(StatusLabel.from(status))
                 .title(req.getTitle())
                 .desc(req.getDesc())
                 .intro(req.getIntro())
@@ -46,6 +47,7 @@ public class ActivityService {
                 .role(req.getRole())
                 .place(req.getPlace())
                 .participants(req.getParticipants())
+                .phone(req.getPhone())
                 .recruitStart(parseDate(req.getRecruitStart()))
                 .recruitEnd(parseDate(req.getRecruitEnd()))
                 .periodText(req.getPeriodText())
@@ -58,11 +60,12 @@ public class ActivityService {
     @Transactional
     public Long update(Long id, ActivityDto.Request req) {
         validate(req);
+        String status = (req.getStatus() == null || req.getStatus().isBlank()) ? "scheduled" : req.getStatus();
         Activity activity = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Activity not found"));
         activity.update(
-                req.getStatus(), req.getTitle(), req.getDesc(), req.getIntro(),
-                req.getMentor(), req.getRole(), req.getPlace(), req.getParticipants(),
+                status, req.getTitle(), req.getDesc(), req.getIntro(),
+                req.getMentor(), req.getRole(), req.getPlace(), req.getParticipants(), req.getPhone(),
                 parseDate(req.getRecruitStart()), parseDate(req.getRecruitEnd()),
                 req.getPeriodText(), toJson(req.getSchedule()), toJson(req.getImages())
         );
@@ -77,15 +80,14 @@ public class ActivityService {
     }
 
     private void validate(ActivityDto.Request req) {
-        if (req.getStatus() == null || req.getStatus().isBlank()) {
-            throw new IllegalArgumentException("status는 필수입니다.");
-        }
         if (req.getTitle() == null || req.getTitle().isBlank()) {
             throw new IllegalArgumentException("title은 필수입니다.");
         }
-        // recruiting 상태일 경우 모집 기간 필수
-        if ("recruiting".equals(req.getStatus())) {
-            if (req.getRecruitStart() == null || req.getRecruitEnd() == null) {
+        // recruiting 상태일 경우 모집 기간 필수 (빈 문자열도 체크)
+        String status = (req.getStatus() == null || req.getStatus().isBlank()) ? "scheduled" : req.getStatus();
+        if ("recruiting".equals(status)) {
+            if (req.getRecruitStart() == null || req.getRecruitStart().isBlank() ||
+                req.getRecruitEnd() == null || req.getRecruitEnd().isBlank()) {
                 throw new IllegalArgumentException("recruiting 상태는 recruitStart, recruitEnd가 필수입니다.");
             }
         }
@@ -93,7 +95,11 @@ public class ActivityService {
 
     private LocalDate parseDate(String date) {
         if (date == null || date.isBlank()) return null;
-        return LocalDate.parse(date);
+        try {
+            return LocalDate.parse(date);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다. (예: 2026-06-01)");
+        }
     }
 
     private String toJson(List<String> list) {

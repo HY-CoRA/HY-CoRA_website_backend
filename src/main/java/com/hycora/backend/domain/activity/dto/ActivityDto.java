@@ -26,6 +26,7 @@ public class ActivityDto {
         private String role;
         private String place;
         private String participants;
+        private String phone;
         private String recruitStart;
         private String recruitEnd;
         private String periodText;
@@ -44,6 +45,7 @@ public class ActivityDto {
                     .role(a.getRole())
                     .place(a.getPlace())
                     .participants(a.getParticipants())
+                    .phone(a.getPhone())
                     .recruitStart(a.getRecruitStart() != null ? a.getRecruitStart().toString() : null)
                     .recruitEnd(a.getRecruitEnd() != null ? a.getRecruitEnd().toString() : null)
                     .periodText(a.getPeriodText())
@@ -72,6 +74,7 @@ public class ActivityDto {
         private String role;
         private String place;
         private String participants;
+        private String phone;
         private String recruitStart;
         private String recruitEnd;
         private String periodText;
