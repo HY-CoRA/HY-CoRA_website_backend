@@ -21,11 +21,20 @@ public class SiteConfigService {
     private static final java.util.Set<String> VALID_KEYS =
             java.util.Set.of("main-banner", "about-banner", "apply-links");
 
+    private static final java.util.Map<String, Map<String, Object>> DEFAULTS = java.util.Map.of(
+            "main-banner", java.util.Map.of("imageUrl", "", "altText", "HY-CoRA 메인 배너"),
+            "about-banner", java.util.Map.of("imageUrl", "", "altText", "HY-CoRA 소개 페이지 배너"),
+            "apply-links", java.util.Map.of(
+                    "newMember", java.util.Map.of("url", "", "label", "신규 지원"),
+                    "returning", java.util.Map.of("url", "", "label", "재가입 지원")
+            )
+    );
+
     public Map<String, Object> get(String key) {
         validateKey(key);
-        SiteConfig config = siteConfigRepository.findByKey(key)
-                .orElseThrow(() -> new IllegalArgumentException("Config not found: " + key));
-        return parseValue(config.getValue());
+        return siteConfigRepository.findByKey(key)
+                .map(config -> parseValue(config.getValue()))
+                .orElse(DEFAULTS.get(key));
     }
 
     @Transactional
