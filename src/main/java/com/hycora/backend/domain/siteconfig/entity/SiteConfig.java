@@ -1,9 +1,7 @@
 package com.hycora.backend.domain.siteconfig.entity;
 
-import com.hycora.backend.domain.admin.entity.Admin;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -14,6 +12,8 @@ import java.time.LocalDate;
 )
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SiteConfig {
 
     @Id
@@ -32,10 +32,6 @@ public class SiteConfig {
     @Column(name = "updated_at")
     private LocalDate updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
-
     @PrePersist
     private void prePersist() {
         this.createdAt = LocalDate.now();
@@ -45,5 +41,9 @@ public class SiteConfig {
     @PreUpdate
     private void preUpdate() {
         this.updatedAt = LocalDate.now();
+    }
+
+    public void updateValue(String value) {
+        this.value = value;
     }
 }
