@@ -19,7 +19,7 @@ public class SiteConfigService {
     private final ObjectMapper objectMapper;
 
     private static final java.util.Set<String> VALID_KEYS =
-            java.util.Set.of("main-banner", "about-banner", "apply-links");
+            java.util.Set.of("main-banner", "about-banner", "apply-links", "recruitment-schedule");
 
     private static final java.util.Map<String, Map<String, Object>> DEFAULTS = java.util.Map.of(
             "main-banner", java.util.Map.of("imageUrl", "", "altText", "HY-CoRA 메인 배너"),
@@ -32,6 +32,9 @@ public class SiteConfigService {
 
     public Map<String, Object> get(String key) {
         validateKey(key);
+        if ("recruitment-schedule".equals(key)) {
+            return getRecruitmentSchedule();
+        }
         return siteConfigRepository.findByKey(key)
                 .map(config -> parseValue(key, config.getValue()))
                 .orElse(DEFAULTS.get(key));
@@ -46,6 +49,77 @@ public class SiteConfigService {
                 () -> siteConfigRepository.save(
                         SiteConfig.builder().key(key).value(json).build()
                 )
+        );
+    }
+
+    private Map<String, Object> getRecruitmentSchedule() {
+        int year = siteConfigRepository.findByKey("recruitment-year")
+                .map(c -> Integer.parseInt(c.getValue()))
+                .orElse(java.time.Year.now().getValue());
+
+        Map<String, Object> schedule = siteConfigRepository.findByKey("recruitment-schedule")
+                .map(c -> {
+                    try {
+                        return objectMapper.readValue(c.getValue(), new TypeReference<Map<String, Object>>() {});
+                    } catch (JsonProcessingException e) {
+                        return new java.util.HashMap<String, Object>();
+                    }
+                })
+                .orElse(new java.util.HashMap<>());
+
+        Map<String, Object> s1 = getOrEmptySemester(schedule, "semester1");
+        Map<String, Object> s2 = getOrEmptySemester(schedule, "semester2");
+        s1.put("reregistrationDate", "02.15");
+        s2.put("reregistrationDate", "08.15");
+
+        return java.util.Map.of("year", year, "semester1", s1, "semester2", s2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getOrEmptySemester(Map<String, Object> schedule, String key) {
+        Object raw = schedule.get(key);
+        if (raw instanceof Map) {
+            return new java.util.HashMap<>((Map<String, Object>) raw);
+        }
+        Map<String, Object> empty = new java.util.HashMap<>();
+        empty.put("regularStart", null);
+        empty.put("regularEnd", null);
+        return empty;
+    }
+
+    @Transactional
+    public void updateRecruitmentYear(int newYear) {
+        upsert("recruitment-year", String.valueOf(newYear));
+
+        // 정규 모집 날짜 초기화
+        Map<String, Object> schedule = siteConfigRepository.findByKey("recruitment-schedule")
+                .map(c -> {
+                    try {
+                        return objectMapper.readValue(c.getValue(), new TypeReference<Map<String, Object>>() {});
+                    } catch (JsonProcessingException e) {
+                        return new java.util.HashMap<String, Object>();
+                    }
+                })
+                .orElse(new java.util.HashMap<>());
+
+        Map<String, Object> empty = new java.util.HashMap<>();
+        empty.put("regularStart", null);
+        empty.put("regularEnd", null);
+        schedule.put("semester1", new java.util.HashMap<>(empty));
+        schedule.put("semester2", new java.util.HashMap<>(empty));
+        upsert("recruitment-schedule", toJson(schedule));
+    }
+
+    public int getCurrentRecruitmentYear() {
+        return siteConfigRepository.findByKey("recruitment-year")
+                .map(c -> Integer.parseInt(c.getValue()))
+                .orElse(java.time.Year.now().getValue());
+    }
+
+    private void upsert(String key, String value) {
+        siteConfigRepository.findByKey(key).ifPresentOrElse(
+                config -> config.updateValue(value),
+                () -> siteConfigRepository.save(SiteConfig.builder().key(key).value(value).build())
         );
     }
 
