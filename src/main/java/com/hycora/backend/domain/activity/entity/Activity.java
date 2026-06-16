@@ -85,6 +85,11 @@ public class Activity {
         this.updatedAt = LocalDate.now();
     }
 
+    public void updateStatus(String status, String statusLabel) {
+        this.status = status;
+        this.statusLabel = statusLabel;
+    }
+
     public void update(String status, String title, String desc, String intro,
                        String mentor, String role, String place, String participants, String phone,
                        LocalDate recruitStart, LocalDate recruitEnd, String periodText,
