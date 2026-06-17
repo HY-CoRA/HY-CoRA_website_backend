@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,8 @@ public class SiteConfigService {
 
     private static final java.util.Set<String> VALID_KEYS =
             java.util.Set.of("main-banner", "about-banner", "apply-links", "recruitment-schedule");
+
+    private static final Pattern DATE_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
 
     private static final java.util.Map<String, Map<String, Object>> DEFAULTS = java.util.Map.of(
             "main-banner", java.util.Map.of("imageUrl", "", "altText", "HY-CoRA 메인 배너"),
@@ -43,6 +46,9 @@ public class SiteConfigService {
     @Transactional
     public void save(String key, Map<String, Object> body) {
         validateKey(key);
+        if ("recruitment-schedule".equals(key)) {
+            body = sanitizeRecruitmentSchedule(body);
+        }
         String json = toJson(body);
         siteConfigRepository.findByKey(key).ifPresentOrElse(
                 config -> config.updateValue(json),
@@ -50,6 +56,37 @@ public class SiteConfigService {
                         SiteConfig.builder().key(key).value(json).build()
                 )
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> sanitizeRecruitmentSchedule(Map<String, Object> body) {
+        Map<String, Object> result = new java.util.HashMap<>();
+        for (String semester : java.util.List.of("semester1", "semester2")) {
+            Object raw = body.get(semester);
+            Map<String, Object> semesterData = new java.util.HashMap<>();
+            if (raw instanceof Map) {
+                Map<String, Object> semesterMap = (Map<String, Object>) raw;
+                semesterData.put("regularStart", validateDate(semester + ".regularStart", semesterMap.get("regularStart")));
+                semesterData.put("regularEnd", validateDate(semester + ".regularEnd", semesterMap.get("regularEnd")));
+            } else {
+                semesterData.put("regularStart", null);
+                semesterData.put("regularEnd", null);
+            }
+            result.put(semester, semesterData);
+        }
+        return result;
+    }
+
+    private Object validateDate(String fieldName, Object value) {
+        if (value == null) return null;
+        if (!(value instanceof String)) {
+            throw new IllegalArgumentException(fieldName + " 값은 null 또는 yyyy-MM-dd 형식이어야 합니다.");
+        }
+        String dateStr = (String) value;
+        if (!DATE_PATTERN.matcher(dateStr).matches()) {
+            throw new IllegalArgumentException(fieldName + " 날짜 형식이 올바르지 않습니다: " + dateStr + " (yyyy-MM-dd 형식 필요)");
+        }
+        return dateStr;
     }
 
     private Map<String, Object> getRecruitmentSchedule() {
