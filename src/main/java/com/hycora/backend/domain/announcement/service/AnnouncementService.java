@@ -54,7 +54,7 @@ public class AnnouncementService {
     // 생성
     @Transactional
     public Long create(AnnouncementDto.Request req) {
-        validateCategory(req.getCategory());
+        validate(req);
         Announcement announcement = Announcement.create(
                 req.getCategory(), req.getTitle(), req.getSummary(), req.getContent(),
                 req.getDate(), req.getPublished(), req.getSource(),
@@ -66,7 +66,7 @@ public class AnnouncementService {
     // 수정
     @Transactional
     public Long update(Long id, AnnouncementDto.Request req) {
-        validateCategory(req.getCategory());
+        validate(req);
         Announcement announcement = announcementRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항을 찾을 수 없습니다."));
         announcement.update(
@@ -94,9 +94,15 @@ public class AnnouncementService {
         return Boolean.TRUE.equals(announcement.getPublished());
     }
 
-    private void validateCategory(String category) {
-        if (category == null || !java.util.Set.of("event", "recruitment", "etc").contains(category)) {
+    private void validate(AnnouncementDto.Request req) {
+        if (req.getCategory() == null || !java.util.Set.of("event", "recruitment", "etc").contains(req.getCategory())) {
             throw new IllegalArgumentException("category는 event, recruitment, etc 중 하나여야 합니다.");
+        }
+        if (req.getTitle() == null || req.getTitle().isBlank()) {
+            throw new IllegalArgumentException("title은 필수입니다.");
+        }
+        if (req.getSource() != null && !java.util.Set.of("manual", "kakao_bot").contains(req.getSource())) {
+            throw new IllegalArgumentException("source는 manual, kakao_bot 중 하나여야 합니다.");
         }
     }
 }
