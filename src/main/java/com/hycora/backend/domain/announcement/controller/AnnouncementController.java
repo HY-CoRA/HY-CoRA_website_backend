@@ -23,10 +23,11 @@ public class AnnouncementController {
     @GetMapping
     public ResponseEntity<?> getPublicList(
             @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "desc") String sort,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int limit
     ) {
-        return ResponseEntity.ok(announcementService.getPublicList(category, page, size));
+        return ResponseEntity.ok(announcementService.getPublicList(category, sort, page, limit));
     }
 
     @Operation(summary = "공지사항 공개 상세 조회", description = "published=true인 공지사항만 반환합니다.")

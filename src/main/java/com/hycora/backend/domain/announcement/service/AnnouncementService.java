@@ -18,10 +18,12 @@ public class AnnouncementService {
 
     private final AnnouncementRepository announcementRepository;
 
-    // 공개 목록 (published=true, ?category 필터, 페이지네이션)
-    public List<AnnouncementDto.Response> getPublicList(String category, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        if (category != null && !category.isBlank()) {
+    // 공개 목록 (published=true, ?category 필터, ?sort, 페이지네이션)
+    public List<AnnouncementDto.Response> getPublicList(String category, String sort, int page, int limit) {
+        Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, limit, Sort.by(direction, "createdAt"));
+        boolean filterCategory = category != null && !category.isBlank() && !"all".equalsIgnoreCase(category);
+        if (filterCategory) {
             return announcementRepository.findAllByPublishedTrueAndCategory(category, pageable)
                     .getContent().stream().map(AnnouncementDto.Response::from).toList();
         }
