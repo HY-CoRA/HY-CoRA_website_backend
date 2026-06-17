@@ -2,7 +2,6 @@ package com.hycora.backend.domain.announcement.entity;
 
 import com.hycora.backend.domain.admin.entity.Admin;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

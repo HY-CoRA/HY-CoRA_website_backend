@@ -11,14 +11,12 @@ public class AnnouncementDto {
     public static class Request {
         private String title;
         private String category;
-        private String category_ko;
         private String date;
         private String summary;
         private String content;
         private String capacity;
         private String link;
         private Boolean published;
-        private String lastModified;
         private String source;
     }
 
