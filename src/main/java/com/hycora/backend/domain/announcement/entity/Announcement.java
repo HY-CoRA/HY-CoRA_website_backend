@@ -2,10 +2,13 @@ package com.hycora.backend.domain.announcement.entity;
 
 import com.hycora.backend.domain.admin.entity.Admin;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(
@@ -76,5 +79,58 @@ public class Announcement {
     @PreUpdate
     private void preUpdate() {
         this.updatedAt = LocalDate.now();
+    }
+
+    public static Announcement create(String category, String title, String summary, String content,
+                                      String date, Boolean published, String source,
+                                      String capacity, String link) {
+        Announcement a = new Announcement();
+        a.category = category;
+        a.categoryKo = toCategoryKo(category);
+        a.title = title;
+        a.summary = summary;
+        a.content = content;
+        a.date = date;
+        a.published = published != null ? published : false;
+        a.source = source != null ? source : "manual";
+        a.capacity = capacity;
+        a.link = link;
+        a.lastModified = now();
+        return a;
+    }
+
+    public void update(String category, String title, String summary, String content,
+                       String date, Boolean published, String source,
+                       String capacity, String link) {
+        this.category = category;
+        this.categoryKo = toCategoryKo(category);
+        this.title = title;
+        this.summary = summary;
+        this.content = content;
+        this.date = date;
+        this.published = published != null ? published : false;
+        this.source = source != null ? source : "manual";
+        this.capacity = capacity;
+        this.link = link;
+        this.lastModified = now();
+    }
+
+    public void togglePublish() {
+        this.published = !Boolean.TRUE.equals(this.published);
+        this.lastModified = now();
+    }
+
+    private static String toCategoryKo(String category) {
+        if (category == null) return null;
+        return switch (category) {
+            case "event" -> "행사";
+            case "recruitment" -> "모집";
+            case "etc" -> "기타";
+            default -> category;
+        };
+    }
+
+    private static String now() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
     }
 }
