@@ -109,7 +109,7 @@ public class Announcement {
         this.summary = summary;
         this.content = content;
         this.date = date;
-        this.published = published != null ? published : false;
+        this.published = published != null ? published : this.published;
         this.source = source != null ? source : "manual";
         this.capacity = capacity;
         this.link = link;

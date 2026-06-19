@@ -20,6 +20,9 @@ public class AnnouncementService {
 
     // 공개 목록 (published=true, ?category 필터, ?sort, 페이지네이션)
     public List<AnnouncementDto.Response> getPublicList(String category, String sort, int page, int limit) {
+        if (page < 0) throw new IllegalArgumentException("page는 0 이상이어야 합니다.");
+        if (limit <= 0) throw new IllegalArgumentException("limit은 1 이상이어야 합니다.");
+        if (limit > 100) throw new IllegalArgumentException("limit은 100 이하이어야 합니다.");
         Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, limit, Sort.by(direction, "createdAt"));
         boolean filterCategory = category != null && !category.isBlank() && !"all".equalsIgnoreCase(category);

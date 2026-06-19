@@ -27,7 +27,11 @@ public class AnnouncementController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        return ResponseEntity.ok(announcementService.getPublicList(category, sort, page, limit));
+        try {
+            return ResponseEntity.ok(announcementService.getPublicList(category, sort, page, limit));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @Operation(summary = "공지사항 공개 상세 조회", description = "published=true인 공지사항만 반환합니다.")
