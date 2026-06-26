@@ -9,6 +9,8 @@ import com.hycora.backend.domain.activity.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
+import java.io.File;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +21,9 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final ObjectMapper objectMapper;
+
+    @Value("${app.upload-dir}")
+    private String uploadDir;
 
     public List<ActivityDto.Response> getAll(String status) {
         List<Activity> activities = (status != null)
@@ -76,6 +81,18 @@ public class ActivityService {
     public void delete(Long id) {
         Activity activity = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Activity not found"));
+
+        File activityDir = new File(uploadDir + "/activities/" + id);
+        if (activityDir.exists()) {
+            File[] files = activityDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+            activityDir.delete();
+        }
+
         activityRepository.delete(activity);
     }
 
