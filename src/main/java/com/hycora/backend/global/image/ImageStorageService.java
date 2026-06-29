@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class ImageStorageService {
 
     static final long MAX_FILE_SIZE = 5L * 1024 * 1024;
-    static final int MAX_ACTIVITY_IMAGES = 10;
+    public static final int MAX_ACTIVITY_IMAGES = 10;
     private static final long MAX_DECODED_PIXELS = 40_000_000L;
     private static final Pattern LEADER_NAME_PATTERN = Pattern.compile(
             "^[\\p{L}\\p{M}\\p{N}](?:[\\p{L}\\p{M}\\p{N} ·'’-]{0,98}[\\p{L}\\p{M}\\p{N}])?$"
@@ -64,15 +64,6 @@ public class ImageStorageService {
         writeAtomically(resized, target);
 
         return new StoredImage(safeName, leaderImageUrl(safeName));
-    }
-
-    public String getLeaderPhotoUrl(String name) {
-        String safeName = validateLeaderName(name);
-        Path target = resolveUnder(resolveUnder(uploadRoot, "leaders"), safeName + ".jpg");
-        if (!Files.isRegularFile(target)) {
-            throw ImageUploadException.notFound("임원진 사진을 찾을 수 없습니다.");
-        }
-        return leaderImageUrl(safeName);
     }
 
     public void deleteLeaderPhoto(String name) {

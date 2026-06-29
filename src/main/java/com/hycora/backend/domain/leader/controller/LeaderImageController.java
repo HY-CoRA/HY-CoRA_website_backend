@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,14 +25,9 @@ public class LeaderImageController {
     @PostMapping(value = "/{name}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> upload(
             @PathVariable String name,
-            @RequestPart("image") MultipartFile image
+            @RequestPart("photo") MultipartFile photo
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(leaderImageService.upload(name, image));
-    }
-
-    @GetMapping("/{name}/photo")
-    public ResponseEntity<?> get(@PathVariable String name) {
-        return ResponseEntity.ok(leaderImageService.get(name));
+        return ResponseEntity.status(HttpStatus.CREATED).body(leaderImageService.upload(name, photo));
     }
 
     @DeleteMapping("/{name}/photo")

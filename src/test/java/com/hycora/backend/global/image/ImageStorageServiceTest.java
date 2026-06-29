@@ -183,7 +183,7 @@ class ImageStorageServiceTest {
     }
 
     @Test
-    void getsAndDeletesLeaderAndActivityImages() throws Exception {
+    void deletesLeaderAndActivityImages() throws Exception {
         imageStorageService.storeLeaderPhoto(
                 "최관우",
                 imageFile("leader.jpg", "image/jpeg", "jpg", 100, 100, Color.RED)
@@ -193,17 +193,11 @@ class ImageStorageServiceTest {
                 List.of(imageFile("activity.jpg", "image/jpeg", "jpg", 100, 100, Color.RED))
         ).getFirst();
 
-        assertThat(imageStorageService.getLeaderPhotoUrl("최관우"))
-                .isEqualTo("/uploads/leaders/%EC%B5%9C%EA%B4%80%EC%9A%B0.jpg");
         imageStorageService.deleteLeaderPhoto("최관우");
         imageStorageService.deleteActivityImage(4L, UUID.fromString(activityImage.id()));
 
         assertThat(uploadRoot.resolve("leaders").resolve("최관우.jpg")).doesNotExist();
         assertThat(uploadRoot.resolve("activities").resolve("4")).doesNotExist();
-        assertThatThrownBy(() -> imageStorageService.getLeaderPhotoUrl("최관우"))
-                .isInstanceOf(ImageUploadException.class)
-                .extracting(exception -> ((ImageUploadException) exception).getStatus().value())
-                .isEqualTo(404);
     }
 
     private MockMultipartFile imageFile(

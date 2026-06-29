@@ -17,10 +17,6 @@ public class LeaderImageService {
         return new LeaderImageDto.Response(storedImage.imageUrl());
     }
 
-    public LeaderImageDto.Response get(String name) {
-        return new LeaderImageDto.Response(imageStorageService.getLeaderPhotoUrl(name));
-    }
-
     public void delete(String name) {
         imageStorageService.deleteLeaderPhoto(name);
     }

@@ -54,7 +54,7 @@ public class ActivityService {
                 .recruitEnd(parseDate(req.getRecruitEnd()))
                 .periodText(req.getPeriodText())
                 .schedule(toJson(req.getSchedule()))
-                .images(toJson(req.getImages()))
+                .images(toJson(List.of()))
                 .build();
         return activityRepository.save(activity).getId();
     }
@@ -69,7 +69,7 @@ public class ActivityService {
                 status, req.getTitle(), req.getDesc(), req.getIntro(),
                 req.getMentor(), req.getRole(), req.getPlace(), req.getParticipants(), req.getPhone(),
                 parseDate(req.getRecruitStart()), parseDate(req.getRecruitEnd()),
-                req.getPeriodText(), toJson(req.getSchedule()), toJson(req.getImages())
+                req.getPeriodText(), toJson(req.getSchedule())
         );
         return activity.getId();
     }

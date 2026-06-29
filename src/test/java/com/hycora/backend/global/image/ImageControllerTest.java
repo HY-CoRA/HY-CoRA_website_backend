@@ -58,12 +58,12 @@ class ImageControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void authenticatedAdminCanUploadLeaderPhoto() throws Exception {
-        MockMultipartFile image =
-                new MockMultipartFile("image", "leader.jpg", "image/jpeg", new byte[]{1});
+        MockMultipartFile photo =
+                new MockMultipartFile("photo", "leader.jpg", "image/jpeg", new byte[]{1});
         when(leaderImageService.upload(eq("최관우"), any()))
                 .thenReturn(new LeaderImageDto.Response("/uploads/leaders/%EC%B5%9C%EA%B4%80%EC%9A%B0.jpg"));
 
-        mockMvc.perform(multipart("/api/leaders/{name}/photo", "최관우").file(image))
+        mockMvc.perform(multipart("/api/leaders/{name}/photo", "최관우").file(photo))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.imageUrl")
                         .value("/uploads/leaders/%EC%B5%9C%EA%B4%80%EC%9A%B0.jpg"));
@@ -71,26 +71,18 @@ class ImageControllerTest {
 
     @Test
     void unauthenticatedLeaderUploadIsRejected() throws Exception {
-        MockMultipartFile image =
-                new MockMultipartFile("image", "leader.jpg", "image/jpeg", new byte[]{1});
+        MockMultipartFile photo =
+                new MockMultipartFile("photo", "leader.jpg", "image/jpeg", new byte[]{1});
 
-        mockMvc.perform(multipart("/api/leaders/{name}/photo", "최관우").file(image))
+        mockMvc.perform(multipart("/api/leaders/{name}/photo", "최관우").file(photo))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void leaderPhotoGetIsPublicAndMissingPhotoReturns404() throws Exception {
-        when(leaderImageService.get("최관우"))
-                .thenReturn(new LeaderImageDto.Response("/uploads/leaders/photo.jpg"));
-        when(leaderImageService.get("없는사람"))
-                .thenThrow(ImageUploadException.notFound("임원진 사진을 찾을 수 없습니다."));
-
+    @WithMockUser(roles = "ADMIN")
+    void removedLeaderPhotoGetReturns405() throws Exception {
         mockMvc.perform(get("/api/leaders/{name}/photo", "최관우"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.imageUrl").value("/uploads/leaders/photo.jpg"));
-        mockMvc.perform(get("/api/leaders/{name}/photo", "없는사람"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("임원진 사진을 찾을 수 없습니다."));
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test

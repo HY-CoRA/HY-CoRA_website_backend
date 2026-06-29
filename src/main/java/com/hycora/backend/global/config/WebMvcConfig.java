@@ -5,20 +5,35 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import java.io.File;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Value("${app.upload-dir}")
-    private String uploadDir;
+    private static final List<String> UPLOAD_SUBDIRECTORIES =
+            List.of("banners", "leaders", "activities", "events");
+
+    private final String uploadDir;
+
+    public WebMvcConfig(@Value("${app.upload-dir}") String uploadDir) {
+        this.uploadDir = uploadDir;
+    }
 
     @PostConstruct
-    public void init(){
-        new File(uploadDir + "/banners").mkdirs();
-        new File(uploadDir + "/leaders").mkdirs();
-        new File(uploadDir + "/activities").mkdirs();
-        new File(uploadDir + "/events").mkdirs();
+    public void init() {
+        Path uploadRoot = Path.of(uploadDir).toAbsolutePath().normalize();
+        for (String subdirectory : UPLOAD_SUBDIRECTORIES) {
+            Path directory = uploadRoot.resolve(subdirectory);
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException exception) {
+                throw new IllegalStateException("업로드 디렉터리를 생성할 수 없습니다: " + directory, exception);
+            }
+        }
     }
 
     @Override
