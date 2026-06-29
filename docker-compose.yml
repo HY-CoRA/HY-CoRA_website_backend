@@ -31,8 +31,11 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN:-https://hycora.co.kr}
       JWT_SECRET: ${JWT_SECRET:-changeme}
       ADMIN_INITIAL_EMAIL: ${ADMIN_INITIAL_EMAIL:-}
+      UPLOAD_DIR: /var/www/hycora-uploads
     ports:
       - "8080:8080"
+    volumes:
+      - ${HOST_UPLOAD_DIR:-/var/www/hycora-uploads}:/var/www/hycora-uploads
 
 volumes:
   mysql-data:
