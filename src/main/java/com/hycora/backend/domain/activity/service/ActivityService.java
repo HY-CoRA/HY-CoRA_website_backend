@@ -6,11 +6,10 @@ import com.hycora.backend.domain.activity.dto.ActivityDto;
 import com.hycora.backend.domain.activity.entity.Activity;
 import com.hycora.backend.domain.activity.entity.StatusLabel;
 import com.hycora.backend.domain.activity.repository.ActivityRepository;
+import com.hycora.backend.global.image.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
-import java.io.File;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,9 +20,7 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final ObjectMapper objectMapper;
-
-    @Value("${app.upload-dir}")
-    private String uploadDir;
+    private final ImageStorageService imageStorageService;
 
     public List<ActivityDto.Response> getAll(String status) {
         List<Activity> activities = (status != null)
@@ -57,7 +54,7 @@ public class ActivityService {
                 .recruitEnd(parseDate(req.getRecruitEnd()))
                 .periodText(req.getPeriodText())
                 .schedule(toJson(req.getSchedule()))
-                .images(toJson(req.getImages()))
+                .images(toJson(List.of()))
                 .build();
         return activityRepository.save(activity).getId();
     }
@@ -72,7 +69,7 @@ public class ActivityService {
                 status, req.getTitle(), req.getDesc(), req.getIntro(),
                 req.getMentor(), req.getRole(), req.getPlace(), req.getParticipants(), req.getPhone(),
                 parseDate(req.getRecruitStart()), parseDate(req.getRecruitEnd()),
-                req.getPeriodText(), toJson(req.getSchedule()), toJson(req.getImages())
+                req.getPeriodText(), toJson(req.getSchedule())
         );
         return activity.getId();
     }
@@ -81,18 +78,7 @@ public class ActivityService {
     public void delete(Long id) {
         Activity activity = activityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Activity not found"));
-
-        File activityDir = new File(uploadDir + "/activities/" + id);
-        if (activityDir.exists()) {
-            File[] files = activityDir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    file.delete();
-                }
-            }
-            activityDir.delete();
-        }
-
+        imageStorageService.deleteActivityDirectory(id);
         activityRepository.delete(activity);
     }
 

@@ -90,10 +90,14 @@ public class Activity {
         this.statusLabel = statusLabel;
     }
 
+    public void updateImages(String images) {
+        this.images = images;
+    }
+
     public void update(String status, String title, String desc, String intro,
                        String mentor, String role, String place, String participants, String phone,
                        LocalDate recruitStart, LocalDate recruitEnd, String periodText,
-                       String schedule, String images) {
+                       String schedule) {
         this.status = status;
         this.statusLabel = StatusLabel.from(status);
         this.title = title;
@@ -108,6 +112,5 @@ public class Activity {
         this.recruitEnd = recruitEnd;
         this.periodText = periodText;
         this.schedule = schedule;
-        this.images = images;
     }
 }
