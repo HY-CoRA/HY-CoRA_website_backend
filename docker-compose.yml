@@ -31,6 +31,11 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN:-https://hycora.co.kr}
       JWT_SECRET: ${JWT_SECRET:-changeme}
       ADMIN_INITIAL_EMAIL: ${ADMIN_INITIAL_EMAIL:-}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAGIC_LINK_CALLBACK_URL: ${MAGIC_LINK_CALLBACK_URL:-https://hycora.co.kr/html/admin/auth-callback.html}
       UPLOAD_DIR: /var/www/hycora-uploads
     ports:
       - "8080:8080"

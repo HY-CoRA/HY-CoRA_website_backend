@@ -27,8 +27,8 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final JavaMailSender mailSender;
 
-    @Value("${app.base-url:http://localhost:8080}")
-    private String baseUrl;
+    @Value("${app.magic-link-callback-url}")
+    private String magicLinkCallbackUrl;
 
     // ── Magic Link ────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ public class AuthService {
             message.setTo(to);
             message.setSubject("[HY-CoRA] 관리자 로그인 링크");
             message.setText("아래 링크로 로그인하세요 (15분 내 사용):\n\n" +
-                    baseUrl + "/admin/auth/callback?token=" + token + "\n\n" +
+                    magicLinkCallbackUrl + "?token=" + token + "\n\n" +
                     "본인이 요청하지 않았다면 무시하세요.");
             mailSender.send(message);
         } catch (Exception e) {
