@@ -2,13 +2,14 @@ services:
   mysql:
     image: mysql:8.0
     container_name: hycora-mysql
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root1234
       MYSQL_DATABASE: hycora
       MYSQL_USER: hycora
       MYSQL_PASSWORD: hycora1234
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -20,6 +21,7 @@ services:
   app:
     build: .
     container_name: hycora-app
+    restart: unless-stopped
     depends_on:
       mysql:
         condition: service_healthy
@@ -38,7 +40,7 @@ services:
       MAGIC_LINK_CALLBACK_URL: ${MAGIC_LINK_CALLBACK_URL:-https://hycora.co.kr/html/admin/auth-callback.html}
       UPLOAD_DIR: /var/www/hycora-uploads
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
       - ${HOST_UPLOAD_DIR:-/var/www/hycora-uploads}:/var/www/hycora-uploads
 
